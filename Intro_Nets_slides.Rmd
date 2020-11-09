@@ -1,0 +1,999 @@
+---
+title: "Intro to Network Analysis with R"
+subtitle: "R-Ladies St. Louis" 
+author: "Maria C. Ramos"
+institute: ""
+date: "2020/11/11"
+output:
+  xaringan::moon_reader:
+    css: ["default", "rladies", "rladies-fonts"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(fig.retina = 3, warning = FALSE, message = FALSE)
+```
+
+```{r load_packages, include = FALSE}
+#install.packages("igraph")
+#install.packages("igraphdata")
+#install.packages("ape")
+library(igraphdata)
+library(igraph)
+library(ape)
+
+```
+
+``` {r, include = FALSE}
+
+#default margins
+def_marg <- c(5.1, 4.1, 4.1, 2.1)
+
+#no margins
+no_marg <- c(0, 0, 0, 0)
+
+```
+class: center, middle
+
+# Intro & Overview
+---
+
+# Network Analysis 
+
+--
++ Map and understand complex structures & systems 
+--
++ Relational methods
+--
++ Connections, structures & positions
+--
+.center[
+##<br><br>_**Entities**_ and their _**relations**_
+]
+
+---
+class: inverse, center, middle
+
+# Some Applications
+---
+COVID-19
+![img_covid](images/covid.png)
+Goodreau SM, Pollock ED, Birnbaum JK, Hamilton DT, Morris M, on behalf of the Statnet Development Team. 2020. Can’t I please just visit one friend?: Visualizing social distancing networks in the era of COVID-19. http://statnet.org/COVID-JustOneFriend/]
+
+---
+Political Polarization
+
+![img_polarization](images/polarization.png)
+<br>Moody, J., & Mucha, P. J. (2013). Portrait of political party polarization. Network Science, 1(1), 119-121.
+
+---
+Connectome<br><br>
+
+![img_food](images/connectome.png)
+
+<br><br>Wu, G. R., Stramaglia, S., Chen, H., Liao, W., & Marinazzo, D. (2013). Mapping the voxel-wise effective connectome in resting state fMRI. PloS one, 8(9), e73670.
+---
+Food Web<br><br>
+![img_food](images/food.png)
+
+<br><br>Ahn, Y. Y., Ahnert, S. E., Bagrow, J. P., & Barabasi, A. L. (2011). Flavor network and the principles of food pairing. Sci Rep, 1, 196.
+---
+
+class: center, top
+
+# Today's Workshop
+
+```{r, include= FALSE}
+data(UKfaculty)
+```
+
+```{r,include= FALSE}
+
+V(UKfaculty)$deg <- degree(UKfaculty, mode = "in")
+
+und_UKfaculty <- as.undirected(UKfaculty)
+kc <- fastgreedy.community(und_UKfaculty)
+
+V(UKfaculty)$community <- kc$membership
+
+mycomcols <- c("black", "#D3D3D3", "#88398A", "white", "#562457")
+
+mylabcols <- c("white", "black", "white", "black", "white")
+
+V(UKfaculty)$color <- mycomcols[V(UKfaculty)$community]
+V(UKfaculty)$label.color <- mylabcols[V(UKfaculty)$community]
+
+```
+
+.center[
+
+```{r, echo=FALSE}
+par(mar=no_marg)
+plot(UKfaculty,
+     vertex.size = 7,
+     vertex.color = V(UKfaculty)$color, 
+     vertex.label.color = V(UKfaculty)$label.color, 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "#88398A",
+     vertex.label.cex= 0.5,
+     edge.color = "gray60",
+     edge.arrow.size = 0.2,
+     edge.width = E(UKfaculty)$weight*0.5,
+     edge.curved = 0.5,
+     mark.groups = list(V(UKfaculty)[kc$membership==1],
+                        V(UKfaculty)[kc$membership==2], 
+                        V(UKfaculty)[kc$membership==3],
+                        V(UKfaculty)[kc$membership==4], 
+                        V(UKfaculty)[kc$membership==5]), 
+          mark.col="gray90", mark.border="#88398A")
+
+
+```
+]
+
+--- 
+
+class: center, middle
+
+# Network Elements
+
+---
+# Basic Network Elements 
+
+- Vertices (nodes)
+
+```{r, include = FALSE}
+data(karate)
+```
+.center[
+```{r, echo = FALSE}
+plot(karate,
+     vertex.color = "#88398A",
+     vertex.label.color = "white", 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 1, 
+     edge.size = 1)
+```
+]
+---
+# Basic Network Elements 
+
+- Edges (ties)
+
+.center[
+```{r, echo = FALSE}
+plot(karate,
+     vertex.color = "white",
+     vertex.label.color = "black", 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 1,
+     edge.color = "#88398A")
+```
+]
+
+---
+# Basic Network Elements 
+
+## Direction
+.pull-left[
+- Directed 
+```{r, echo = FALSE}
+
+g <- graph_from_literal( A +-+ B --+ C +-- D,E --+ G, C +-- G, C --+E, M+--H)
+
+l <- layout_with_fr(g)
+plot(g,
+     vertex.size = 20,
+     vertex.color = "white",
+     vertex.label.color = "black", 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 2.5,
+     edge.color = "#88398A", 
+     edge.width = 5, 
+     edge.arrow.size = 2, 
+     edge.curved = 0.5,
+     layout = l)
+```
+]
+
+.pull-right[
+- Undirected 
+```{r, echo = FALSE}
+g1 <- as.undirected(g)
+plot(g1,
+     vertex.size = 20,
+     vertex.color = "white",
+     vertex.label.color = "black", 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 2.5,
+     edge.color = "#88398A", 
+     edge.width = 5,
+     layout = l)
+```
+]
+
+---
+
+# Basic Network Elements 
+
+## Weights
+
+.pull-left[
+- Unweighted 
+```{r, echo = FALSE}
+plot(g1,
+     vertex.size = 20,
+     vertex.color = "white",
+     vertex.label.color = "black", 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 2.5,
+     edge.color = "#88398A", 
+     edge.width = 5,
+     layout = l)
+```
+]
+
+.pull-right[
+- Weighted 
+```{r, echo = FALSE}
+E(g1)$weight <- c(1,2,5,4,6,7,3)
+
+plot(g1,
+     vertex.size = 20,
+     vertex.color = "white",
+     vertex.label.color = "black", 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 2.5,
+     edge.color = "#88398A", 
+     edge.width = E(g1)$weight,
+     edge.label = E(g1)$weight,
+     edge.label.color = "black",
+     edge.label.cex = 2.5,
+     edge.label.family = "Helvetica",
+     layout = l)
+```
+]
+
+---
+
+class: inverse, center, middle
+
+# Let's take a look at our network 
+
+---
+class: inverse, center, top
+
+# Your turn!
+
+.left[
++ Explore the karate network 
++ How many nodes does the network have? 
++ Is the network directed or indirected? 
++ What vertex and edge attributes does the network have?
+]
+
+```{r, echo = FALSE}
+library(countdown)
+countdown(minutes = 2, 
+          seconds = 00,
+          color_text= "white",
+          color_running_background  = "white",
+          color_running_text = "black",
+          color_finished_background = "black",
+          color_finished_text = "white",
+          left = 0,  right = 0,
+          padding = "50px",
+          margin = "5%",
+          font_size = "6em")
+```
+
+---
+
+```{r, highlight.output = c(1:3)}
+data(karate)
+karate
+```
+
+---
+class: center, middle
+
+# Closer inspection
+
+---
+
+class: inverse, center, top
+
+# Your turn!
+
+.left[
+Replace every [xxx] in the code to answer each question. 
+
++ How many factions does the karate network have?
++ How many nodes belong to each faction?
+]
+
+```{r, echo = FALSE}
+library(countdown)
+countdown(minutes = 2, 
+          seconds = 00,
+          color_text= "white",
+          color_running_background  = "white",
+          color_running_text = "black",
+          color_finished_background = "black",
+          color_finished_text = "white",
+          left = 0,  right = 0,
+          padding = "50px",
+          margin = "5%",
+          font_size = "6em")
+```
+
+---
+
+class: center, middle
+
+# Network Visualization
+
+---
+# Basics
+
+---
+# Plotting Parameters 
+
+**Nodes** 
+
+vertex.[parameter] (e.g., vertex.color =)
+
+```{r, echo=FALSE}
+dfn <- data.frame(node_parameter = c("color", 
+                               "shape",
+                               "size", 
+                               "label", 
+                               "label family",
+                               "label font",
+                               "label cex", 
+                               "label distance", 
+                               ""), 
+                  purpose_options =c("node color", "circle, square, rectangle, sphere, pie, raster, etc.", 
+                                    "default = 15", "vector with labels", "font family of the label: Helvetica, Times", "1= plain, 2= bold, 3= italic, 4 = bold italic", "font size", "distance between node and label", ""))
+dfn %>%
+   knitr::kable(format = "html")
+```
+
+---
+# Plotting Parameters 
+
+**Edges**
+
+edge.[parameter] (e.g., edge.color =)
+
+```{r, echo=FALSE}
+dfe <- data.frame(edge_parameter = c("color", 
+                               "lty",
+                               "width", 
+                               "label",
+                               "label family",
+                               "label font",
+                               "label cex", 
+                               "curvature", 
+                               "arrow size"),
+                  purpose_options =c("edge color", "type of line: 0='blank', 1= 'solid', 2= 'dashed', 3= 'dotted', 4 = 'dotdash', 5= 'longdash', 6= 'twodash'","default = 1", "vector with labels", "font family of the label: Helvetica, Times", "1= plain, 2= bold, 3= italic, 4 = bold italic", "font size", "edge curvature - range [0,1]", "default = 1"))
+
+dfe %>%
+   knitr::kable(format = "html")
+
+```
+
+---
+# Two Options
+
+.pull-left[Option 1: Setting visual properties outside the plot function
+
++ 1. Set vertex/edge attributes
++ 2. Plot the net
+
+```{r, eval=FALSE}
+
+# vertex properties 
+V(UKfaculty)$color <- "dodgerblue" #<<
+
+# vertex label properties
+V(UKfaculty)$label.color <- "white"
+V(UKfaculty)$label.cex <- 0.5
+
+# edge properties
+E(UKfaculty)$color <- "gray"
+
+plot(UKfaculty) #<<
+
+```
+
+]
+
+.pull-right[Option 2 Setting visual properties inside the plot function
++ Use the function arguments
+
+```{r, eval=FALSE}
+
+plot(UKfaculty, #<<
+     # === vertex properties 
+     vertex.color = "dodgerblue", #<<
+     vertex.frame.color = "dodgerblue",
+     vertex.size = 9,
+     # === vertex label properties
+     vertex.label.cex = 0.5,
+     vertex.label.color = "white",
+     vertex.label.family = "Helvetica",
+     # === edge properties
+     edge.color = "gray",
+     edge.width = 0.5,
+     edge.arrow.size = 0.2)
+```
+
+]
+---
+#Which option to choose?
+
+.pull-left[Option 1: Setting visual properties outside the plot function
+
++ 1. Set vertex/edge attributes
++ 2. Plot the net
+
+
+<br><br>_**Use for assigning local visual properties to different subsets**_ 
+
+]
+
+.pull-right[Option 2 Setting visual properties inside the plot function
++ Use the function arguments
+
+
+<br><br><br>_**Use for assigning global visual properties**_ 
+]
+--
+
+.center[<br><br><br>_**Most often combine the two**_] 
+
+---
+
+class: inverse, center, middle
+
+# Let's try these!
+
+---
+
+class: inverse, center, top
+
+# Your turn!
+
+.left[
+Create your own plot of the karate data. Try changing different parameters. 
+
++ Use the parameter cheatsheet and color cheatsheet 
+
+Reach goal: color different subsets of vertices and edges in a different way using the selection tools we learned in the previous section. 
+
+]
+
+```{r, echo = FALSE}
+library(countdown)
+countdown(minutes = 10, 
+          seconds = 00,
+          color_text= "white",
+          color_running_background  = "white",
+          color_running_text = "black",
+          color_finished_background = "black",
+          color_finished_text = "white",
+          left = 0,  right = 0,
+          padding = "50px",
+          margin = "5%",
+          font_size = "6em")
+```
+
+---
+class: center, middle
+
+# Descriptive Network Statistics
+---
+
+# Descriptive Network Statistics
+
+## Density 
+
+Proportion of actual edges out of possible edges. 
+
+--
+## Reciprocity
+
+Two types:
+--
++ Number of reciprocal edges over the total number of edges
+--
++ Number of reciprocal edges over the number of dyads with only one, unreciprocated edge  
+--
+
+**Indication of connectivity**
+---
+
+# Descriptive Network Statistics
+
+## Dyad Census 
+
+Dyads are pairs of vertices. In directed graphs they can be:
+--
++ Null: no edge between the pair.
+--
++ Asymmetric: one directed edge.
+--
++ Mutual: two directed edges. 
+
+--
+**Indication of hierarchical structure.**
+
+---
+# Descriptive Network Statistics
+
+## Transitivity
+
+Also known as clustering coefficient
+
+Fraction of transitive triplets
+
+.pull-left[
+**Transitive triplet**
+```{r, echo = FALSE}
+g2 <- graph_from_literal( A --- B --- C ---A)
+
+l <- layout_with_fr(g2)
+plot(g2,
+     vertex.size = 20,
+     vertex.color = "white",
+     vertex.label.color = "black", 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 2.5,
+     edge.color = "#88398A", 
+     edge.width = 5, 
+     edge.arrow.size = 2,
+     layout = l)
+
+```
+]
+
+.pull-right[
+**Intransitive triplet**
+```{r, echo = FALSE}
+g3 <- graph_from_literal( A --- B --- C)
+
+plot(g3,
+     vertex.size = 20,
+     vertex.color = "white",
+     vertex.label.color = "black", 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 2.5,
+     edge.color = "#88398A", 
+     edge.width = 5, 
+     edge.arrow.size = 2,
+     layout = l)
+
+```
+]
+---
+
+# Descriptive Network Statistics
+
+## Reachability - Average path length
+.center[
+```{r, echo = FALSE}
+g4 <- graph_from_literal( A +-+ B +-- C +-- D,E --+ G, C +-- G, C --+E)
+dapath <- shortest_paths(g4, 
+                            from = V(g4)[name=="D"],
+                         to  = V(g4)[name=="A"],
+                             output = "both")
+ecol <- rep("gray80", ecount(g4))
+ecol[unlist(dapath$epath)] <- "#88398A"
+plot(g4,
+     vertex.size = 15,
+     vertex.color = "white",
+     vertex.label.color = "black", 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 1.5,
+     edge.color = ecol, 
+     edge.width = 4, 
+     edge.arrow.size = 1)
+
+```
+]
+---
+# Descriptive Network Statistics
+
+### Diameter
+
+Distance (number of steps) between farthest vertices
+
+```{r, echo = FALSE}
+plot(g4,
+     vertex.size = 15,
+     vertex.color = "white",
+     vertex.label.color = "black", 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 1.5,
+     edge.color = ecol, 
+     edge.width = 4, 
+     edge.arrow.size = 1)
+
+```
+
+---
+# Descriptive Network Statistics
+
+### Connected components
+
+.pull-left[
+**Strongly connected**
+```{r, echo = FALSE}
+#
+#
+#
+#
+plot(g1,
+     vertex.size = 20,
+     vertex.color = "white",
+     vertex.label.color = "black", 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 2.5,
+     edge.color = "#88398A", 
+     edge.width = 5)
+```
+]
+.pull-right[
+**Weakly connected**
+```{r, echo = FALSE}
+V(g4)$color <- "white"
+V(g4)$color[V(g4)$name %in% c("B", "D")] <- "black"
+V(g4)$lcolor <- "black"
+V(g4)$lcolor[V(g4)$name %in% c("B", "D")] <- "white"
+plot(g4,
+     vertex.size = 15,
+     vertex.color = V(g4)$color,
+     vertex.label.color = V(g4)$lcolor, 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 1.5,
+     edge.color = "#88398A", 
+     edge.width = 4, 
+     edge.arrow.size = 1)
+
+```
+]
+---
+# Descriptive Network Statistics
+
+### Articulation points
+
+Nodes that if removed would break the network into more components.
+
+```{r, echo = FALSE}
+V(g1)$color <- "white"
+V(g1)$color[V(g1)$name=="B"] <- "black"
+V(g1)$lcolor <- "black"
+V(g1)$lcolor[V(g1)$name=="B"] <- "white"
+plot(g1,
+     vertex.size = 20,
+     vertex.color = V(g1)$color,
+     vertex.label.color= V(g1)$lcolor, 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 2.5,
+     edge.color = "#88398A", 
+     edge.width = 5)
+```
+---
+class: inverse, center, middle
+
+# Let's try these!
+
+---
+class: center, top
+
+# Your turn!
+
+.left[
+Obtain the following descriptive statistics for the karate data:
+]
+
+```{r, echo = FALSE}
+dfd <- data.frame(measures = c("density", 
+                               "reciprocity", 
+                               "dyad census",
+                               "transitivity", 
+                               "average path length", 
+                               "diameter", 
+                               "articulation points"), 
+                  functions = c("graph.density(net)", 
+                                "reciprocity(net)", 
+                                "dyad_census(net)",
+                                "transiticity(net)",
+                        "average.path.length(net)",
+                        "diameter(net)",
+                        "articulation.points(net)"))
+
+dfd %>%
+  knitr::kable("html")
+
+```
+
+.center[What can you say about this network?]
+```{r, echo = FALSE}
+countdown(minutes = 5, 
+          seconds = 00,
+          color_text= "black",
+          color_running_background  = "white",
+          color_running_text = "black",
+          color_finished_background = "#88398A",
+          color_finished_text = "white",
+          left = 0, 
+          padding = "5px",
+          margin = "1%",
+          font_size = "4em")
+```
+
+---
+class: center, middle
+
+# Centrality 
+
+---
+# Centrality
+
+### Degree Centrality 
+.pull-left[
+**Indegree**
+```{r, echo = FALSE}
+V(g4)$color <- "white"
+V(g4)$color[V(g4)$name=="C"] <- "black"
+V(g4)$lcolor <- "black"
+V(g4)$lcolor[V(g4)$name=="C"] <- "white"
+E(g4)$color <- "gray70"
+E(g4)$color[E(g4)[to("C")]] <- "#88398A"
+plot(g4,
+     vertex.size = 15,
+     vertex.color = V(g4)$color,
+     vertex.label.color = V(g4)$lcolor, 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 1.5,
+     edge.color = E(g4)$color, 
+     edge.width = 4, 
+     edge.arrow.size = 1)
+```
+]
+
+.pull-right[
+**Outdegree**
+```{r, echo = FALSE}
+V(g4)$color <- "white"
+V(g4)$color[V(g4)$name=="C"] <- "black"
+V(g4)$lcolor <- "black"
+V(g4)$lcolor[V(g4)$name=="C"] <- "white"
+E(g4)$color <- "gray70"
+E(g4)$color[E(g4)[from("C")]] <- "#88398A"
+plot(g4,
+     vertex.size = 15,
+     vertex.color = V(g4)$color,
+     vertex.label.color = V(g4)$lcolor, 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 1.5,
+     edge.color = E(g4)$color, 
+     edge.width = 4, 
+     edge.arrow.size = 1)
+```
+]
+---
+# Centrality
+
+### Closeness Centrality 
+
++ Based on the distance to all other nodes. 
+--
++ Inverse of the node’s average geodesic distance to others in the network.
+
+### Betweenness Centrality 
+
++ Based on its brokerage position.
+--
++ Number of shortest that pass through the node.
+--
+.center[<br><br>**Tease out local versus global patterns**]
+
+---
+# Centrality 
+.center[
+```{r, echo = FALSE}
+g5 <- make_tree(15, children = 3, mode = c("out", "in", "undirected"))
+
+V(g5)$color <- "white"
+V(g5)$color[V(g5)[2,3,4]] <- "black"
+V(g5)$color[V(g5)[1]] <- "#88398A"
+
+V(g5)$lcolor <- "black"
+V(g5)$lcolor[V(g5)[1,2,3,4]] <- "white"
+
+plot(g5,
+     vertex.size = 15,
+     vertex.color = V(g5)$color,
+     vertex.label.color = V(g5)$lcolor, 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "black",
+     vertex.label.cex= 1.5,
+     edge.color = "gray70", 
+     edge.width = 4, 
+     edge.arrow.size = 1)
+```
+]
+
+---
+class: inverse, center, middle
+
+# Let's try these!
+
+---
+
+class: inverse, center, top
+
+# Your turn!
+
+.left[
+
+Calculate degree, closeness, and betweenness centrality for the karate network. 
+
+What are the most central nodes according to different measures?
+]
+
+```{r, echo = FALSE}
+
+countdown(minutes = 2, 
+          seconds = 00,
+          color_text= "white",
+          color_running_background  = "white",
+          color_running_text = "black",
+          color_finished_background = "black",
+          color_finished_text = "white",
+          left = 0,  right = 0,
+          padding = "50px",
+          margin = "5%",
+          font_size = "6em")
+```
+
+---
+class: center, middle
+
+# Community Detection
+---
+# Community Detection
+
+.center[<br> **Goal: find cohesive groups**]
+--
++ Different ways of doing this
+--
++ Modularity: more intra-community edges than one would expect at random
+--
++ Algorithms try to maximize modularity
+--
++ Most of these procedures are done with undirected  & unweighted data
+
+--
+<br><br>.center[**Always check substantively**]
+
+---
+class: inverse, center, middle
+
+# Let's try these!
+
+---
+
+class: inverse, center, top
+
+# Your turn!
+
+.left[
+
+Conduct a community detection procedure for the karate data? 
+
+What are the communities you find?
+
+Plot your results
+]
+
+```{r, echo = FALSE}
+
+countdown(minutes = 2, 
+          seconds = 00,
+          color_text= "white",
+          color_running_background  = "white",
+          color_running_text = "black",
+          color_finished_background = "black",
+          color_finished_text = "white",
+          left = 0,  right = 0,
+          padding = "50px",
+          margin = "5%",
+          font_size = "6em")
+```
+---
+class: center, middle
+
+# Where to go from here?
+---
+# Key Questions
+
+## Networks as independent variables 
+
+Non-network outcome:
+
+- Are people whose friends suffer from some disease more likely to have the disease themselves?
+
+- Do central actors have access to more resources?
+ 
+## Networks as dependent variables 
+
+Network outcome
+
+- How structurally cohesive is a given network?
+
+- What processes generate certain network structures?
+
+---
+# Mechanism of action
+
+## Connectionist
+
+Networks as pipes 
+
+Outcome results from what flows in the network:
+
+- Spread of a virus
+
+- Sharing of information
+
+## Positional 
+
+Outcome results from the positions & roles that nodes occupy:
+
+- Popularity effects
+
+- Network embeddedness 
+
+---
+# More Resources 
+
++ Kolaczyk, E. D., & Csárdi, G. (2014). Statistical analysis of network data with R (Vol. 65): Springer.
+
++ Luke, D. (2015). A User’s Guide to Network Analysis in R. Cham: Springer International Publishing : Imprint: Springer.
+
++ [Duke Network Analysis Center Tutorials](https://https://https://dnac.ssri.duke.edu/)
+
++ [Katya Ognyanova Tutorials](https://https://kateto.net/)
+---
+class: center, middle
+# Thank you!
+
+.center[Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).]
+
+.center[<br><br><br>[mariacramos.com](https://https://mariacramos.com/)
+<br><br>.large[@mariacramosf]
+]

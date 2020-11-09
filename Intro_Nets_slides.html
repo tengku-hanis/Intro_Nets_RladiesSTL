@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Intro to Network Analysis with R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Maria C. Ramos" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/rladies.css" rel="stylesheet" />
+    <link href="libs/remark-css/rladies-fonts.css" rel="stylesheet" />
+    <link href="libs/countdown/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown/countdown.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Intro to Network Analysis with R
+## R-Ladies St. Louis
+### Maria C. Ramos
+### 2020/11/11
+
+---
+
+
+
+
+
+
+
+class: center, middle
+
+# Intro &amp; Overview
+---
+
+# Network Analysis 
+
+--
++ Map and understand complex structures &amp; systems 
+--
++ Relational methods
+--
++ Connections, structures &amp; positions
+--
+.center[
+##&lt;br&gt;&lt;br&gt;_**Entities**_ and their _**relations**_
+]
+
+---
+class: inverse, center, middle
+
+# Some Applications
+---
+COVID-19
+![img_covid](images/covid.png)
+Goodreau SM, Pollock ED, Birnbaum JK, Hamilton DT, Morris M, on behalf of the Statnet Development Team. 2020. Can’t I please just visit one friend?: Visualizing social distancing networks in the era of COVID-19. http://statnet.org/COVID-JustOneFriend/]
+
+---
+Political Polarization
+
+![img_polarization](images/polarization.png)
+&lt;br&gt;Moody, J., &amp; Mucha, P. J. (2013). Portrait of political party polarization. Network Science, 1(1), 119-121.
+
+---
+Connectome&lt;br&gt;&lt;br&gt;
+
+![img_food](images/connectome.png)
+
+&lt;br&gt;&lt;br&gt;Wu, G. R., Stramaglia, S., Chen, H., Liao, W., &amp; Marinazzo, D. (2013). Mapping the voxel-wise effective connectome in resting state fMRI. PloS one, 8(9), e73670.
+---
+Food Web&lt;br&gt;&lt;br&gt;
+![img_food](images/food.png)
+
+&lt;br&gt;&lt;br&gt;Ahn, Y. Y., Ahnert, S. E., Bagrow, J. P., &amp; Barabasi, A. L. (2011). Flavor network and the principles of food pairing. Sci Rep, 1, 196.
+---
+
+class: center, top
+
+# Today's Workshop
+
+
+
+
+
+.center[
+
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-4-1.png" width="504" /&gt;
+]
+
+--- 
+
+class: center, middle
+
+# Network Elements
+
+---
+# Basic Network Elements 
+
+- Vertices (nodes)
+
+
+.center[
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-6-1.png" width="504" /&gt;
+]
+---
+# Basic Network Elements 
+
+- Edges (ties)
+
+.center[
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-7-1.png" width="504" /&gt;
+]
+
+---
+# Basic Network Elements 
+
+## Direction
+.pull-left[
+- Directed 
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-8-1.png" width="504" /&gt;
+]
+
+.pull-right[
+- Undirected 
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-9-1.png" width="504" /&gt;
+]
+
+---
+
+# Basic Network Elements 
+
+## Weights
+
+.pull-left[
+- Unweighted 
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-10-1.png" width="504" /&gt;
+]
+
+.pull-right[
+- Weighted 
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-11-1.png" width="504" /&gt;
+]
+
+---
+
+class: inverse, center, middle
+
+# Let's take a look at our network 
+
+---
+class: inverse, center, top
+
+# Your turn!
+
+.left[
++ Explore the karate network 
++ How many nodes does the network have? 
++ Is the network directed or indirected? 
++ What vertex and edge attributes does the network have?
+]
+
+<div class="countdown" id="timer_5fa97bde" style="right:0;bottom:0;left:0;margin:5%;padding:50px;font-size:6em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+
+```r
+data(karate)
+karate
+```
+
+```
+*## IGRAPH 4b458a1 UNW- 34 78 -- Zachary's karate club network
+*## + attr: name (g/c), Citation (g/c), Author (g/c), Faction
+*## | (v/n), name (v/c), label (v/c), color (v/n), weight (e/n)
+## + edges from 4b458a1 (vertex names):
+##  [1] Mr Hi  --Actor 2  Mr Hi  --Actor 3  Mr Hi  --Actor 4 
+##  [4] Mr Hi  --Actor 5  Mr Hi  --Actor 6  Mr Hi  --Actor 7 
+##  [7] Mr Hi  --Actor 8  Mr Hi  --Actor 9  Mr Hi  --Actor 11
+## [10] Mr Hi  --Actor 12 Mr Hi  --Actor 13 Mr Hi  --Actor 14
+## [13] Mr Hi  --Actor 18 Mr Hi  --Actor 20 Mr Hi  --Actor 22
+## [16] Mr Hi  --Actor 32 Actor 2--Actor 3  Actor 2--Actor 4 
+## [19] Actor 2--Actor 8  Actor 2--Actor 14 Actor 2--Actor 18
+## + ... omitted several edges
+```
+
+---
+class: center, middle
+
+# Closer inspection
+
+---
+
+class: inverse, center, top
+
+# Your turn!
+
+.left[
+Replace every [xxx] in the code to answer each question. 
+
++ How many factions does the karate network have?
++ How many nodes belong to each faction?
+]
+
+<div class="countdown" id="timer_5fa97ae4" style="right:0;bottom:0;left:0;margin:5%;padding:50px;font-size:6em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: center, middle
+
+# Network Visualization
+
+---
+# Basics
+
+---
+# Plotting Parameters 
+
+**Nodes** 
+
+vertex.[parameter] (e.g., vertex.color =)
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; node_parameter &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; purpose_options &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; color &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; node color &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; shape &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; circle, square, rectangle, sphere, pie, raster, etc. &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; size &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; default = 15 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; label &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; vector with labels &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; label family &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; font family of the label: Helvetica, Times &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; label font &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1= plain, 2= bold, 3= italic, 4 = bold italic &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; label cex &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; font size &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; label distance &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; distance between node and label &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# Plotting Parameters 
+
+**Edges**
+
+edge.[parameter] (e.g., edge.color =)
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; edge_parameter &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; purpose_options &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; color &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; edge color &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; lty &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; type of line: 0='blank', 1= 'solid', 2= 'dashed', 3= 'dotted', 4 = 'dotdash', 5= 'longdash', 6= 'twodash' &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; width &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; default = 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; label &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; vector with labels &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; label family &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; font family of the label: Helvetica, Times &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; label font &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1= plain, 2= bold, 3= italic, 4 = bold italic &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; label cex &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; font size &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; curvature &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; edge curvature - range [0,1] &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; arrow size &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; default = 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# Two Options
+
+.pull-left[Option 1: Setting visual properties outside the plot function
+
++ 1. Set vertex/edge attributes
++ 2. Plot the net
+
+
+```r
+# vertex properties 
+*V(UKfaculty)$color &lt;- "dodgerblue"
+
+# vertex label properties
+V(UKfaculty)$label.color &lt;- "white"
+V(UKfaculty)$label.cex &lt;- 0.5
+
+# edge properties
+E(UKfaculty)$color &lt;- "gray"
+
+*plot(UKfaculty)
+```
+
+]
+
+.pull-right[Option 2 Setting visual properties inside the plot function
++ Use the function arguments
+
+
+```r
+*plot(UKfaculty,
+     # === vertex properties 
+*    vertex.color = "dodgerblue",
+     vertex.frame.color = "dodgerblue",
+     vertex.size = 9,
+     # === vertex label properties
+     vertex.label.cex = 0.5,
+     vertex.label.color = "white",
+     vertex.label.family = "Helvetica",
+     # === edge properties
+     edge.color = "gray",
+     edge.width = 0.5,
+     edge.arrow.size = 0.2)
+```
+
+]
+---
+#Which option to choose?
+
+.pull-left[Option 1: Setting visual properties outside the plot function
+
++ 1. Set vertex/edge attributes
++ 2. Plot the net
+
+
+&lt;br&gt;&lt;br&gt;_**Use for assigning local visual properties to different subsets**_ 
+
+]
+
+.pull-right[Option 2 Setting visual properties inside the plot function
++ Use the function arguments
+
+
+&lt;br&gt;&lt;br&gt;&lt;br&gt;_**Use for assigning global visual properties**_ 
+]
+--
+
+.center[&lt;br&gt;&lt;br&gt;&lt;br&gt;_**Most often combine the two**_] 
+
+---
+
+class: inverse, center, middle
+
+# Let's try these!
+
+---
+
+class: inverse, center, top
+
+# Your turn!
+
+.left[
+Create your own plot of the karate data. Try changing different parameters. 
+
++ Use the parameter cheatsheet and color cheatsheet 
+
+Reach goal: color different subsets of vertices and edges in a different way using the selection tools we learned in the previous section. 
+
+]
+
+<div class="countdown" id="timer_5fa97aba" style="right:0;bottom:0;left:0;margin:5%;padding:50px;font-size:6em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: center, middle
+
+# Descriptive Network Statistics
+---
+
+# Descriptive Network Statistics
+
+## Density 
+
+Proportion of actual edges out of possible edges. 
+
+--
+## Reciprocity
+
+Two types:
+--
++ Number of reciprocal edges over the total number of edges
+--
++ Number of reciprocal edges over the number of dyads with only one, unreciprocated edge  
+--
+
+**Indication of connectivity**
+---
+
+# Descriptive Network Statistics
+
+## Dyad Census 
+
+Dyads are pairs of vertices. In directed graphs they can be:
+--
++ Null: no edge between the pair.
+--
++ Asymmetric: one directed edge.
+--
++ Mutual: two directed edges. 
+
+--
+**Indication of hierarchical structure.**
+
+---
+# Descriptive Network Statistics
+
+## Transitivity
+
+Also known as clustering coefficient
+
+Fraction of transitive triplets
+
+.pull-left[
+**Transitive triplet**
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-20-1.png" width="504" /&gt;
+]
+
+.pull-right[
+**Intransitive triplet**
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-21-1.png" width="504" /&gt;
+]
+---
+
+# Descriptive Network Statistics
+
+## Reachability - Average path length
+.center[
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-22-1.png" width="504" /&gt;
+]
+---
+# Descriptive Network Statistics
+
+### Diameter
+
+Distance (number of steps) between farthest vertices
+
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-23-1.png" width="504" /&gt;
+
+---
+# Descriptive Network Statistics
+
+### Connected components
+
+.pull-left[
+**Strongly connected**
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-24-1.png" width="504" /&gt;
+]
+.pull-right[
+**Weakly connected**
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-25-1.png" width="504" /&gt;
+]
+---
+# Descriptive Network Statistics
+
+### Articulation points
+
+Nodes that if removed would break the network into more components.
+
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-26-1.png" width="504" /&gt;
+---
+class: inverse, center, middle
+
+# Let's try these!
+
+---
+class: center, top
+
+# Your turn!
+
+.left[
+Obtain the following descriptive statistics for the karate data:
+]
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; measures &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; functions &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; density &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; graph.density(net) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; reciprocity &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; reciprocity(net) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; dyad census &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; dyad_census(net) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; transitivity &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; transiticity(net) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; average path length &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; average.path.length(net) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; diameter &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; diameter(net) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; articulation points &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; articulation.points(net) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[What can you say about this network?]
+<div class="countdown" id="timer_5fa978e4" style="bottom:0;left:0;margin:1%;padding:5px;font-size:4em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: center, middle
+
+# Centrality 
+
+---
+# Centrality
+
+### Degree Centrality 
+.pull-left[
+**Indegree**
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-29-1.png" width="504" /&gt;
+]
+
+.pull-right[
+**Outdegree**
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-30-1.png" width="504" /&gt;
+]
+---
+# Centrality
+
+### Closeness Centrality 
+
++ Based on the distance to all other nodes. 
+--
++ Inverse of the node’s average geodesic distance to others in the network.
+
+### Betweenness Centrality 
+
++ Based on its brokerage position.
+--
++ Number of shortest that pass through the node.
+--
+.center[&lt;br&gt;&lt;br&gt;**Tease out local versus global patterns**]
+
+---
+# Centrality 
+.center[
+&lt;img src="Intro_Nets_slides_files/figure-html/unnamed-chunk-31-1.png" width="504" /&gt;
+]
+
+---
+class: inverse, center, middle
+
+# Let's try these!
+
+---
+
+class: inverse, center, top
+
+# Your turn!
+
+.left[
+
+Calculate degree, closeness, and betweenness centrality for the karate network. 
+
+What are the most central nodes according to different measures?
+]
+
+<div class="countdown" id="timer_5fa97a72" style="right:0;bottom:0;left:0;margin:5%;padding:50px;font-size:6em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: center, middle
+
+# Community Detection
+---
+# Community Detection
+
+.center[&lt;br&gt; **Goal: find cohesive groups**]
+--
++ Different ways of doing this
+--
++ Modularity: more intra-community edges than one would expect at random
+--
++ Algorithms try to maximize modularity
+--
++ Most of these procedures are done with undirected  &amp; unweighted data
+
+--
+&lt;br&gt;&lt;br&gt;.center[**Always check substantively**]
+
+---
+class: inverse, center, middle
+
+# Let's try these!
+
+---
+
+class: inverse, center, top
+
+# Your turn!
+
+.left[
+
+Conduct a community detection procedure for the karate data? 
+
+What are the communities you find?
+
+Plot your results
+]
+
+<div class="countdown" id="timer_5fa97b88" style="right:0;bottom:0;left:0;margin:5%;padding:50px;font-size:6em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+---
+class: center, middle
+
+# Where to go from here?
+---
+# Key Questions
+
+## Networks as independent variables 
+
+Non-network outcome:
+
+- Are people whose friends suffer from some disease more likely to have the disease themselves?
+
+- Do central actors have access to more resources?
+ 
+## Networks as dependent variables 
+
+Network outcome
+
+- How structurally cohesive is a given network?
+
+- What processes generate certain network structures?
+
+---
+# Mechanism of action
+
+## Connectionist
+
+Networks as pipes 
+
+Outcome results from what flows in the network:
+
+- Spread of a virus
+
+- Sharing of information
+
+## Positional 
+
+Outcome results from the positions &amp; roles that nodes occupy:
+
+- Popularity effects
+
+- Network embeddedness 
+
+---
+# More Resources 
+
++ Kolaczyk, E. D., &amp; Csárdi, G. (2014). Statistical analysis of network data with R (Vol. 65): Springer.
+
++ Luke, D. (2015). A User’s Guide to Network Analysis in R. Cham: Springer International Publishing : Imprint: Springer.
+
++ [Duke Network Analysis Center Tutorials](https://https://https://dnac.ssri.duke.edu/)
+
++ [Katya Ognyanova Tutorials](https://https://kateto.net/)
+---
+class: center, middle
+# Thank you!
+
+.center[Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).]
+
+.center[&lt;br&gt;&lt;br&gt;&lt;br&gt;[mariacramos.com](https://https://mariacramos.com/)
+&lt;br&gt;&lt;br&gt;.large[@mariacramosf]
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
