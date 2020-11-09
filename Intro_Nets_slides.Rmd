@@ -46,11 +46,17 @@ class: center, middle
 # Network Analysis 
 
 --
+
 + Map and understand complex structures & systems 
+
 --
+
 + Relational methods
+
 --
+
 + Connections, structures & positions
+
 --
 .center[
 ##<br><br>_**Entities**_ and their _**relations**_
@@ -347,6 +353,18 @@ class: center, middle
 ---
 # Basics
 
+--
+
++ Via algorithms 
+
+--
+
++ Reduce the crossing of edges 
+
+--
+
++ Keep the edge length as constant as possible
+
 ---
 # Plotting Parameters 
 
@@ -508,6 +526,8 @@ class: center, middle
 
 # Descriptive Network Statistics
 
+--
+
 ## Density 
 
 Proportion of actual edges out of possible edges. 
@@ -515,39 +535,59 @@ Proportion of actual edges out of possible edges.
 --
 ## Reciprocity
 
-Two types:
---
-+ Number of reciprocal edges over the total number of edges
---
-+ Number of reciprocal edges over the number of dyads with only one, unreciprocated edge  
+Two types
+
 --
 
-**Indication of connectivity**
++ Number of reciprocal edges over the total number of edges
+
+--
+
++ Number of reciprocal edges over the number of dyads with only one, unreciprocated edge  
+
+--
+
+.center[**Indication of connectivity**]
 ---
 
 # Descriptive Network Statistics
 
 ## Dyad Census 
 
+--
+
 Dyads are pairs of vertices. In directed graphs they can be:
+
 --
+
 + Null: no edge between the pair.
+
 --
+
 + Asymmetric: one directed edge.
+
 --
+
 + Mutual: two directed edges. 
 
 --
-**Indication of hierarchical structure.**
+
+.center[**Indication of hierarchical structure**]
 
 ---
 # Descriptive Network Statistics
 
 ## Transitivity
 
+--
+
 Also known as clustering coefficient
 
+--
+
 Fraction of transitive triplets
+
+--
 
 .pull-left[
 **Transitive triplet**
@@ -693,12 +733,12 @@ V(g1)$color[V(g1)$name=="B"] <- "black"
 V(g1)$lcolor <- "black"
 V(g1)$lcolor[V(g1)$name=="B"] <- "white"
 plot(g1,
-     vertex.size = 20,
+     vertex.size = 12,
      vertex.color = V(g1)$color,
      vertex.label.color= V(g1)$lcolor, 
      vertex.label.family = "Helvetica",
      vertex.frame.color = "black",
-     vertex.label.cex= 2.5,
+     vertex.label.cex= 1.5,
      edge.color = "#88398A", 
      edge.width = 5)
 ```
@@ -809,16 +849,28 @@ plot(g4,
 
 ### Closeness Centrality 
 
-+ Based on the distance to all other nodes. 
 --
+
++ Based on the distance to all other nodes. 
+
+--
+
 + Inverse of the node’s average geodesic distance to others in the network.
+
+--
 
 ### Betweenness Centrality 
 
+--
+
 + Based on its brokerage position.
+
 --
+
 + Number of shortest that pass through the node.
+
 --
+
 .center[<br><br>**Tease out local versus global patterns**]
 
 ---
@@ -867,7 +919,7 @@ What are the most central nodes according to different measures?
 
 ```{r, echo = FALSE}
 
-countdown(minutes = 2, 
+countdown(minutes = 5, 
           seconds = 00,
           color_text= "white",
           color_running_background  = "white",
@@ -887,17 +939,28 @@ class: center, middle
 ---
 # Community Detection
 
+--
+
 .center[<br> **Goal: find cohesive groups**]
+
 --
+
 + Different ways of doing this
+
 --
+
 + Modularity: more intra-community edges than one would expect at random
+
 --
+
 + Algorithms try to maximize modularity
+
 --
+
 + Most of these procedures are done with undirected  & unweighted data
 
 --
+
 <br><br>.center[**Always check substantively**]
 
 ---
@@ -922,7 +985,7 @@ Plot your results
 
 ```{r, echo = FALSE}
 
-countdown(minutes = 2, 
+countdown(minutes = 5, 
           seconds = 00,
           color_text= "white",
           color_running_background  = "white",
@@ -941,42 +1004,78 @@ class: center, middle
 ---
 # Key Questions
 
+--
+
 ## Networks as independent variables 
+
+--
 
 Non-network outcome:
 
+--
+
 - Are people whose friends suffer from some disease more likely to have the disease themselves?
 
+--
+
 - Do central actors have access to more resources?
- 
+
+--
+
 ## Networks as dependent variables 
+
+--
 
 Network outcome
 
+--
+
 - How structurally cohesive is a given network?
+
+--
 
 - What processes generate certain network structures?
 
 ---
-# Mechanism of action
+# Mechanism of Action
+
+--
 
 ## Connectionist
 
+--
+
 Networks as pipes 
+
+--
 
 Outcome results from what flows in the network:
 
+--
+
 - Spread of a virus
+
+--
 
 - Sharing of information
 
+--
+
 ## Positional 
+
+--
 
 Outcome results from the positions & roles that nodes occupy:
 
+--
+
 - Popularity effects
 
+--
+
 - Network embeddedness 
+
+--
 
 ---
 # More Resources 
