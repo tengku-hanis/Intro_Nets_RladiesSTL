@@ -581,6 +581,29 @@ countdown(minutes = 10,
 ```
 
 ---
+class: inverse, top, center
+
+# Break 
+
+## Take some time to stretch :)
+
+```{r, echo = FALSE}
+countdown(minutes = 5, 
+          seconds = 00,
+          color_text= "white",
+          color_running_background  = "white",
+          color_running_text = "black",
+          color_finished_background = "black",
+          color_finished_text = "white",
+          left = 0,  right = 0,
+          padding = "50px",
+          margin = "5%",
+          font_size = "6em")
+```
+
+
+---
+
 class: center, middle
 
 # Descriptive Network Statistics
@@ -1131,8 +1154,6 @@ class: inverse, center, top
 Conduct a community detection procedure for the karate data? 
 
 What are the communities you find?
-
-Plot your results
 ]
 
 ```{r, echo = FALSE}
@@ -1149,6 +1170,31 @@ countdown(minutes = 5,
           margin = "5%",
           font_size = "6em")
 ```
+
+---
+# Solution
+
+```{r}
+kc <- fastgreedy.community(karate)
+class(kc)
+length(kc)
+sizes(kc)
+modularity(kc)
+```
+---
+# Solution
+.pull-left[
+```{r}
+plot(kc, karate)
+```
+]
+
+.pull-right[
+```{r}
+dendPlot(kc, mode = "phylo")
+```
+]
+
 ---
 class: center, middle
 

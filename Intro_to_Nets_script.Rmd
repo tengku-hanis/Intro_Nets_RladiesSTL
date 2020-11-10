@@ -36,7 +36,6 @@ no_marg <- c(0, 0, 0, 0)
 Plot of our network 
 
 ```{r}
-
 par(mar=no_marg)
 plot(UKfaculty, 
      vertex.size = 9,
@@ -429,7 +428,7 @@ V(UKfaculty)$label.color <- "black"
 V(UKfaculty)$frame.color <- "black"
 
 #coloring 5 most central nodes
-V(UKfaculty)$color[V(UKfaculty)[c(29, 37, 77, 62, 52)]] <- "#88398A"
+V(UKfaculty)$color[V(UKfaculty)[c(29,37,77,62,52)]] <- "#88398A"
 
 plot(UKfaculty, 
      vertex.size=10,
@@ -477,7 +476,6 @@ plot(UKfaculty,
      vertex.size=10,
      vertex.label.cex = 0.4,
      edge.arrow.size = 0.1)
-
 ```
 
 # Your turn!
@@ -522,12 +520,44 @@ plot(kc, und_UKfaculty)
 dendPlot(kc, mode = "phylo")
 ```
 
+Improving the plot
+
+```{r}
+V(UKfaculty)$community <- kc$membership
+
+mycomcols <- c("black", "#D3D3D3", "#88398A", "white", "#562457")
+
+mylabcols <- c("white", "black", "white", "black", "white")
+
+V(UKfaculty)$color <- mycomcols[V(UKfaculty)$community]
+V(UKfaculty)$label.color <- mylabcols[V(UKfaculty)$community]
+
+par(mar=no_marg)
+plot(UKfaculty,
+     vertex.size = 7,
+     vertex.color = V(UKfaculty)$color, 
+     vertex.label.color = V(UKfaculty)$label.color, 
+     vertex.label.family = "Helvetica",
+     vertex.frame.color = "#88398A",
+     vertex.label.cex= 0.5,
+     edge.color = "gray60",
+     edge.arrow.size = 0.2,
+     edge.width = E(UKfaculty)$weight*0.5,
+     edge.curved = 0.5,
+     mark.groups = list(V(UKfaculty)[kc$membership==1],
+                   V(UKfaculty)[kc$membership==2], 
+                   V(UKfaculty)[kc$membership==3],
+                   V(UKfaculty)[kc$membership==4],
+                   V(UKfaculty)[kc$membership==5]), 
+          mark.col="gray90", mark.border="#88398A")
+
+```
+
 # Now you try it!
 
 Conduct a community structure procedure with 
 the karate data. How many groups do you obtain?
 
 ```{r}
-
 ```
 
