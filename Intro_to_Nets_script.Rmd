@@ -553,7 +553,7 @@ plot(UKfaculty,
 
 ```
 
-# Now you try it!
+# Your turn!
 
 Conduct a community structure procedure with 
 the karate data. How many groups do you obtain?
