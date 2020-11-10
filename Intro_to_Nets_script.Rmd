@@ -40,8 +40,8 @@ Plot of our network
 par(mar=no_marg)
 plot(UKfaculty, 
      vertex.size = 9,
-     vertex.color = "dodgerblue",
-     vertex.frame.color= "dodgerblue",
+     vertex.color = "#88398A",
+     vertex.frame.color= "#88398A",
      vertex.label.family = "Helvetica", 
      vertex.label.cex = 0.5,
      vertex.label.color = "white",
@@ -64,9 +64,12 @@ Does the graph has multiple edges per pair of nodes? Does the graph have any loo
 is.simple(UKfaculty)
 ```
 
-# Now you try it!
+# Your turn!
 
-How many nodes does the karate network have? Is the karate network directed or indirected? What vertex and edge attributes does the network have?
+Explore the karate network
+How many nodes does the network have?
+Is the network directed or indirected?
+What vertex and edge attributes does the network have?
 
 ```{r}
 data(karate)
@@ -104,7 +107,7 @@ E(UKfaculty)$weight
 
 summary(E(UKfaculty)$weight)
 
-par(mar=c(2,2,2,2))
+par(mar=def_marg)
 hist(E(UKfaculty)$weight)
 ```
 
@@ -180,7 +183,7 @@ E(UKfaculty)[from(1)]
 
 ```
 
-# Now you try it!
+# Your turn!
 
 Let's take a closer look at the karate network! 
 
@@ -192,15 +195,42 @@ karate
 
 Replace every [xxx] in the following code to answer each question. 
 
-How many factions does the karate network have? How many nodes belong to each faction?
+How many factions does the karate network have? 
+How many nodes belong to each faction?
 
 ```{r}
-table(V(karate)$Faction)
+table(V(karate)$[xxx])
 ```
 
+Which nodes nominated Mr. Hi?
 
 ```{r}
-V(karate)[[1:5]]
+
+neighbors(karate, "Mr Hi", mode = [xxx])
+
+```
+
+Which nodes nominated John A?
+
+```{r}
+[xxx](karate, "John A", mode = "in")
+```
+
+How many nodes nominated both Mr Hi and John A?
+
+```{r}
+
+mh <- neighbors([xxx], "Mr Hi", mode = [xxx])
+ja <- neighbors([xxx], "John A", mode = [xxx])
+
+sum(mh %in% ja)
+
+```
+
+Is there an edge between Mr Hi and John A?
+
+```{r}
+E(karate)["Mr Hi" [xxx] "John A"]
 ```
 
 # Network Visualization 
@@ -209,7 +239,7 @@ Basic plot
 
 ```{r}
 #setting wider margins
-par(mar=c(0,0,0,0))
+par(mar=no_marg)
 
 #basic plot
 plot(UKfaculty)
@@ -224,7 +254,7 @@ Step 1 Set vertex and/or edge attributes
 ```{r}
 
 # vertex properties 
-V(UKfaculty)$color <- "dodgerblue"
+V(UKfaculty)$color <- "#88398A"
 
 # vertex label properties
 V(UKfaculty)$label.color <- "white"
@@ -251,8 +281,8 @@ We use the function arguments
 
 plot(UKfaculty, 
      # === vertex properties 
-     vertex.color = "dodgerblue",
-     vertex.frame.color = "dodgerblue",
+     vertex.color = "#88398A",
+     vertex.frame.color = "#88398A",
      vertex.size = 9,
      # === vertex label properties
      vertex.label.cex = 0.5,
@@ -272,13 +302,16 @@ Coloring nodes by group
 ```{r}
 table(V(UKfaculty)$Group)
 
-mycolors <- c("#55C667FF",
-              "#404788FF",
-              "#481567FF",
-              "#33638DFF")
+mycolors <- c("black", 
+              "#D3D3D3", 
+              "#88398A", 
+              "white", 
+              "#562457")
+mylabcols <- c("white", "black", "white", "black", "white")
 
 V(UKfaculty)$color <- mycolors[V(UKfaculty)$Group]
 V(UKfaculty)$frame.color <- mycolors[V(UKfaculty)$Group]
+V(UKfaculty)$label.color <- mylabcols[V(UKfaculty)$Group]
 
 plot(UKfaculty)
 ```
@@ -300,7 +333,7 @@ Coloring specifc edges
 
 ```{r}
 E(UKfaculty)$color <- "gray"
-E(UKfaculty)$color[E(UKfaculty)[47%--%28]] <- "red"
+E(UKfaculty)$color[E(UKfaculty)[47%--%28]] <- "#88398A"
 
 plot(UKfaculty, 
      # === vertex properties 
@@ -336,14 +369,11 @@ dyad_census(UKfaculty)
 
 # Transitivity 
 transitivity(UKfaculty)
-transitivity(UKfaculty, type="local")
-triad_census(UKfaculty)
 
 # Reachability 
 average.path.length(UKfaculty)
 
 diameter(UKfaculty, weights = NA)
-diameter(UKfaculty, directed = FALSE, weights = NA)
 
 farthest_vertices(UKfaculty)
 
@@ -378,6 +408,8 @@ hist(degree(UKfaculty, mode = "out"),
 
 deg <- degree(UKfaculty, mode="all")
 
+V(UKfaculty)$deg <- deg
+
 par(mar= no_marg)
 
 plot(UKfaculty, 
@@ -387,25 +419,73 @@ plot(UKfaculty,
      vertex.size=sqrt(deg)+1,
      vertex.label.cex = 0.4,
      edge.arrow.size = 0.1)
+
+# arrange by degree
+sort(deg, decreasing = T, index.return = T)
+
+# uniform coloring
+V(UKfaculty)$color <- "white"
+V(UKfaculty)$label.color <- "black"
+V(UKfaculty)$frame.color <- "black"
+
+#coloring 5 most central nodes
+V(UKfaculty)$color[V(UKfaculty)[c(29, 37, 77, 62, 52)]] <- "#88398A"
+
+plot(UKfaculty, 
+     vertex.size=10,
+     vertex.label.cex = 0.4,
+     edge.arrow.size = 0.1)
 ```
 
 ## Closeness Centrality 
 
 ```{r}
-closeness(UKfaculty, mode="all", weights=NA) 
+cl <- closeness(UKfaculty, mode="all", weights=NA) 
 
 centr_clo(UKfaculty, mode="all", normalized=T)
 
+# arrange by closeness
+sort(cl, decreasing = T, index.return = T)
+
+# uniform coloring
+V(UKfaculty)$color <- "white"
+
+#coloring 5 most central nodes
+V(UKfaculty)$color[V(UKfaculty)[c(29, 37, 62, 52, 69)]] <- "#88398A"
+
+plot(UKfaculty, 
+     vertex.size=10,
+     vertex.label.cex = 0.4,
+     edge.arrow.size = 0.1)
 ```
 
 ## Betweenness Centrality 
 
 ```{r}
-betweenness(net, directed=T, weights=NA)
+btw <- betweenness(UKfaculty, directed=T, weights=NA)
 
-edge_betweenness(net, directed=T, weights=NA)
+edge_betweenness(UKfaculty, directed=T, weights=NA)
 
-centr_betw(net, directed=T, normalized=T)
+centr_betw(UKfaculty, directed=T, normalized=T)
+
+# sorting by betweenness 
+sort(btw, decreasing = T, index.return = T)
+
+V(UKfaculty)$color[V(UKfaculty)[c(62, 29, 37, 38, 52)]] <- "#88398A"
+
+plot(UKfaculty, 
+     vertex.size=10,
+     vertex.label.cex = 0.4,
+     edge.arrow.size = 0.1)
+
+```
+
+# Your turn!
+
+Obtain measures of density, reciprocity, dyad census, transitivity, average path length, diameter, and articulation points for the karate network. 
+
+```{r}
+
 ```
 
 # Community Detection
